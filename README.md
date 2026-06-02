@@ -1,6 +1,6 @@
 # Financial Fraud Detection Analytics Platform
 
-An end-to-end fraud detection analytics platform built on 590,540 real-world financial transactions from the IEEE-CIS dataset. The platform covers the full data pipeline — from raw data ingestion and SQL analytics to machine learning fraud classification with explainable AI.
+An end-to-end fraud detection analytics platform built on 590,540 real-world financial transactions from the IEEE-CIS dataset. The platform covers the full data pipeline — from raw data ingestion and SQL analytics to machine learning fraud classification with explainable AI and a 3-page Power BI executive dashboard.
 
 ---
 
@@ -9,7 +9,7 @@ An end-to-end fraud detection analytics platform built on 590,540 real-world fin
 | Metric | Value |
 |--------|-------|
 | Dataset size | 590,540 transactions |
-| Total transaction value | $79.7M |
+| Total transaction value | $79.74M |
 | Fraud amount identified | $3.08M |
 | Fraud rate | 3.5% (20,663 fraudulent transactions) |
 | XGBoost AUC | 0.81 |
@@ -20,13 +20,53 @@ An end-to-end fraud detection analytics platform built on 590,540 real-world fin
 
 ---
 
+## Power BI Dashboard
+
+### Page 1 — Fraud Overview
+
+![Fraud Overview Dashboard](dashboard/dashboard_1.png)
+
+**Key insights from this page:**
+- **590.54K transactions** analyzed with **$79.74M** total transaction value
+- **20.66K fraudulent transactions** — 3.5% overall fraud rate
+- **Discover cards** have the highest fraud rate at **7.7%** — more than double Visa (3.5%) and Mastercard (3.4%)
+- **Hour 7 UTC peaks at 10.5% fraud rate** — hours 5–9 UTC form a sustained high-risk window nearly 3x the baseline rate
+
+---
+
+### Page 2 — Risk Drill-Down
+
+![Risk Drill-Down Dashboard](dashboard/dashboard_2.png)
+
+**Key insights from this page:**
+- **Credit cards** show **6.7% fraud rate** vs debit cards at 2.4% — nearly 3x higher risk
+- **Mobile devices** have a higher fraud rate than desktop — a previously undiscovered signal from the device dimension
+- **Discover credit** at 8% and **Visa credit** at 7% are the highest risk card network + type combinations
+- Risk segmentation table shows fraud rate by every card network and card type combination — actionable for fraud rule targeting
+
+---
+
+### Page 3 — Model Performance
+
+![Model Performance Dashboard](dashboard/dashboard_3.png)
+
+**Key insights from this page:**
+- **XGBoost AUC 0.81** vs Logistic Regression baseline 0.59 — 37% improvement
+- **76% of all fraud cases caught** (86,222 true positives) with 72% precision
+- **27,753 fraud cases missed** (false negatives) — documented precision-recall tradeoff
+- **34,092 legitimate transactions flagged** (false positives) — key metric for customer experience teams
+- XGBoost bar clearly longer than Logistic Regression — visual proof of model improvement
+
+---
+
 ## Key Findings
 
 - **Discover cards** have the highest fraud rate at **7.7%** — more than double Visa (3.5%) and Mastercard (3.4%)
 - **Credit cards** show **6.7% fraud rate** vs debit cards at 2.4% — nearly 3x higher risk
 - **Hours 5–9 UTC** represent a sustained high-risk window peaking at **10.5% fraud rate at hour 7** — nearly 3x the baseline
-- **Highest risk segment**: Discover credit cards at hour 11 — **27.1% fraud rate**
+- **Highest risk segment**: Discover credit cards — **8% fraud rate**
 - **Visa** carries the most dollar exposure at **$1.99M** despite lower fraud rate — purely due to transaction volume
+- **Mobile devices** show higher fraud rate than desktop — additional risk signal from device dimension
 - Chi-square test confirms card network is a statistically significant fraud predictor (**χ²=368.90, p≈0**)
 
 ---
@@ -44,7 +84,7 @@ Phase 3: SQL Analytics — CTEs, window functions, 3 views, $ at risk
      ↓
 Phase 4: ML Model — XGBoost classifier + SHAP explainability
      ↓
-Phase 5: Power BI Dashboard — 3-page fraud KPI reporting (coming soon)
+Phase 5: Power BI Dashboard — 3-page fraud KPI reporting
 ```
 
 ---
@@ -125,12 +165,10 @@ Top fraud signal features identified by SHAP:
 ```
 Financial-Fraud-Detection-Analytics-Platform/
 ├── data/
-│   ├── raw/
-│   │   ├── train_transaction.csv
-│   │   └── train_identity.csv
-│   ├── fraud_detection.db          ← SQLite star schema database
-│   ├── smote_resampled.pkl         ← SMOTE balanced dataset
-│   ├── xgb_fraud_model.pkl         ← Trained XGBoost model
+│   ├── raw/                            ← Download from Kaggle (not included)
+│   ├── fraud_detection.db              ← SQLite star schema database
+│   ├── smote_resampled.pkl             ← SMOTE balanced dataset
+│   ├── xgb_fraud_model.pkl             ← Trained XGBoost model
 │   ├── eda_finding1_class_imbalance.png
 │   ├── eda_finding2_transaction_amount.png
 │   ├── eda_finding3_card_type.png
@@ -141,12 +179,17 @@ Financial-Fraud-Detection-Analytics-Platform/
 │   ├── shap_summary.png
 │   └── shap_force_plot.png
 ├── notebooks/
-│   ├── 01_eda.ipynb                ← Phase 1: EDA — 6 findings
-│   ├── 02_etl_pipeline.ipynb       ← Phase 2: ETL + star schema + SMOTE
-│   ├── 03_sql_analytics.ipynb      ← Phase 3: SQL CTEs + views + chi-square
-│   └── 04_model.ipynb              ← Phase 4: XGBoost + SHAP
+│   ├── 01_eda.ipynb                    ← Phase 1: EDA — 6 findings
+│   ├── 02_etl_pipeline.ipynb           ← Phase 2: ETL + star schema + SMOTE
+│   ├── 03_sql_analytics.ipynb          ← Phase 3: SQL CTEs + views + chi-square
+│   └── 04_model.ipynb                  ← Phase 4: XGBoost + SHAP
 ├── dashboard/
-│   └── FraudDetection.pbix         ← Phase 5: Power BI dashboard (coming soon)
+│   ├── FraudDetection.pbix             ← Power BI dashboard file
+│   ├── dashboard_1.png                 ← Page 1: Fraud Overview
+│   ├── dashboard_2.png                 ← Page 2: Risk Drill-Down
+│   └── dashboard_3.png                 ← Page 3: Model Performance
+├── .gitignore
+├── LICENSE
 └── README.md
 ```
 
@@ -157,8 +200,8 @@ Financial-Fraud-Detection-Analytics-Platform/
 **1. Clone the repo and set up virtual environment**
 
 ```bash
-git clone https://github.com/yourusername/Financial-Fraud-Detection-Analytics-Platform.git
-cd Financial-Fraud-Detection-Analytics-Platform
+git clone https://github.com/prasadpatil0103/Financial-Fraud-Detection-Analytics-.git
+cd Financial-Fraud-Detection-Analytics-
 python -m venv venv
 source venv/bin/activate        # Mac/Linux
 venv\Scripts\activate           # Windows
@@ -180,11 +223,15 @@ Place `train_transaction.csv` and `train_identity.csv` in `data/raw/`
 **4. Run notebooks in order**
 
 ```
-01_eda.ipynb          → EDA and fraud pattern discovery
-02_etl_pipeline.ipynb → ETL pipeline, star schema, SMOTE
+01_eda.ipynb           → EDA and fraud pattern discovery
+02_etl_pipeline.ipynb  → ETL pipeline, star schema, SMOTE
 03_sql_analytics.ipynb → SQL analytics and views
-04_model.ipynb        → XGBoost model and SHAP explainability
+04_model.ipynb         → XGBoost model and SHAP explainability
 ```
+
+**5. Open Power BI dashboard**
+
+Open `dashboard/FraudDetection.pbix` in Power BI Desktop and connect to `data/fraud_detection.db` via ODBC.
 
 ---
 
@@ -201,6 +248,7 @@ xgboost
 shap
 jupyter
 ipykernel
+scipy
 ```
 
 ---
@@ -220,10 +268,10 @@ ipykernel
 
 | Role | What this project demonstrates |
 |------|-------------------------------|
-| Data Analyst | SQL CTEs, window functions, statistical validation, segmentation analysis |
+| Data Analyst | SQL CTEs, window functions, statistical validation, segmentation analysis, Power BI dashboarding |
 | Data Scientist | XGBoost, SMOTE, SHAP explainability, baseline comparison, AUC evaluation |
-| Data Engineer | ETL pipeline, star schema design, feature engineering, SQLite data warehouse |
-| Business Analyst | $3.08M fraud exposure quantified, risk segment identification, executive KPI framing |
+| Data Engineer | ETL pipeline, star schema design, feature engineering, SQLite data warehouse, ODBC connection |
+| Business Analyst | $3.08M fraud exposure quantified, risk segment identification, executive KPI dashboard |
 
 ---
 
